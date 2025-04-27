@@ -200,25 +200,19 @@ def list_to_str(k):
         return ', '.join(str(item) for item in k)
 
 
-async def get_shortlink(link, grp_id, is_second_shortener=False, is_third_shortener=False , pm_mode=False):
-    if not pm_mode:
-        settings = await get_settings(grp_id)
-    else:
-        settings = SETTINGS
-    if IS_VERIFY:
-        if is_third_shortener:             
-            api, site = settings['api_three'], settings['shortner_three']
-        else:
-            if is_second_shortener:
-                api, site = settings['api_two'], settings['shortner_two']
-            else:
-                api, site = settings['api'], settings['shortner']
-        shortzy = Shortzy(api, site)
-        try:
-            link = await shortzy.convert(link)
-        except Exception as e:
-            link = await shortzy.get_quick_link(link)
-    return link
+import base64
+
+async def get_shortlink(link):
+    try:
+        # Encode the original link to Base64
+        encoded_link = base64.urlsafe_b64encode(link.encode()).decode()
+
+        # Construct the safelink URL with the encoded link
+        safelink_url = f"https://moxibeatz.fun/p/1.html?url={encoded_link}"
+        return safelink_url
+    except Exception as e:
+        logger.error(f"Safelink generation error: {e}")
+        return link
 
 def get_file_id(message: "Message") -> Any:
     media_types = (
